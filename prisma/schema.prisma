@@ -1,0 +1,109 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider        = "prisma-client"
+  previewFeatures = ["jsonProtocol"]
+  output          = "../src/server/db/client"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                String              @id @default(cuid())
+  email             String?             @unique
+  featureSelections FeatureSelections[]
+  journalEntries    JournalEntry[]
+  workoutLogs       WorkoutLog[]
+  calendarItems     CalendarItem[]
+  sleepLogs         SleepLog[]
+  analyzerFindings  AnalyzerFinding[]
+  aiWorkouts        AiWorkoutPlan[]
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+}
+
+model FeatureSelections {
+  id        String   @id @default(cuid())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  calendar  Boolean  @default(false)
+  journal   Boolean  @default(false)
+  aiWorkout Boolean  @default(false)
+  sleep     Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model JournalEntry {
+  id            String   @id @default(cuid())
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId        String
+  content       String
+  sentiment     Float?
+  positivityTag String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model WorkoutLog {
+  id            String   @id @default(cuid())
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId        String
+  title         String
+  scheduledDate DateTime
+  completed     Boolean  @default(false)
+  notes         String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model CalendarItem {
+  id        String   @id @default(cuid())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  title     String
+  dueDate   DateTime
+  completed Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model SleepLog {
+  id        String   @id @default(cuid())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  startTime DateTime
+  endTime   DateTime
+  quality   Int?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model AnalyzerFinding {
+  id        String       @id @default(cuid())
+  user      User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  type      FindingType
+  title     String
+  message   String
+  severity  Int
+  createdAt DateTime     @default(now())
+}
+
+enum FindingType {
+  ALERT
+  REINFORCEMENT
+}
+
+model AiWorkoutPlan {
+  id             String   @id @default(cuid())
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId         String
+  requestPayload Json
+  responsePayload Json
+  artifactPath   String
+  createdAt      DateTime @default(now())
+}

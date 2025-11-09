@@ -1,65 +1,108 @@
-import Image from "next/image";
+export const dynamic = "force-dynamic";
 
-export default function Home() {
+import { AnalyzerFeed } from "@/components/analyzer-feed";
+import { CalendarPanel } from "@/components/calendar-panel";
+import { FeatureSelectionForm } from "@/components/feature-selection-form";
+import { JournalPanel } from "@/components/journal-panel";
+import { SuccessWebSummary } from "@/components/success-web-summary";
+import { WorkoutGeneratorForm } from "@/components/workout-generator-form";
+import { WorkoutLogPanel } from "@/components/workout-log-panel";
+import { getDashboardState } from "@/server/services/dashboard";
+
+type DashboardState = Awaited<ReturnType<typeof getDashboardState>>;
+
+export default async function HomePage() {
+  const state: DashboardState = await getDashboardState();
+
+  const latestSelection = state.latestSelection
+    ? {
+        calendar: state.latestSelection.calendar,
+        journal: state.latestSelection.journal,
+        aiWorkout: state.latestSelection.aiWorkout,
+        sleep: state.latestSelection.sleep,
+        createdAt: state.latestSelection.createdAt.toISOString(),
+      }
+    : null;
+
+  const latestWorkout = state.latestWorkoutPlan
+    ? {
+        id: state.latestWorkoutPlan.id,
+        programName:
+          typeof state.latestWorkoutPlan.responsePayload === "object" && state.latestWorkoutPlan.responsePayload !== null
+            ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              (state.latestWorkoutPlan.responsePayload as any).programName ?? "AI Workout"
+            : "AI Workout",
+        createdAt: state.latestWorkoutPlan.createdAt.toISOString(),
+        artifactPath: state.latestWorkoutPlan.artifactPath,
+      }
+    : null;
+
+  const showWorkoutGenerator = latestSelection?.aiWorkout ?? false;
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <main className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-black text-white">
+      <section className="mx-auto flex max-w-6xl flex-col gap-12 px-4 py-12">
+        <header className="rounded-3xl border border-white/10 bg-[radial-gradient(circle_at_top,_rgba(79,70,229,0.25),_transparent_60%)] p-10 text-center shadow-2xl">
+          <div className="mx-auto flex max-w-3xl flex-col gap-4">
+            <p className="text-sm uppercase tracking-[0.3em] text-emerald-300">Agentic wellness companion</p>
+            <h1 className="text-3xl font-semibold leading-tight md:text-4xl">
+              Neural Adapt keeps a pulse on your mental and physical health—intervening before you hit the wall.
+            </h1>
+            <p className="text-base text-white/70">
+              Configure the modules you want, generate AI-personalized workouts powered by OpenAI, and let the analyzer agent surface timely
+              warnings or reinforcement inside the Success Web dashboard.
+            </p>
+          </div>
+        </header>
+
+        <SuccessWebSummary selection={latestSelection} latestWorkout={latestWorkout} />
+
+        <FeatureSelectionForm initial={latestSelection} />
+
+        <WorkoutGeneratorForm visible={showWorkoutGenerator} />
+
+        <div className="grid gap-6 lg:grid-cols-2">
+          <JournalPanel
+            entries={state.journalEntries.map((entry: DashboardState["journalEntries"][number]) => ({
+              id: entry.id,
+              content: entry.content,
+              createdAt: entry.createdAt.toISOString(),
+              positivityTag: entry.positivityTag,
+              sentiment: entry.sentiment,
+            }))}
+          />
+          <AnalyzerFeed
+            findings={state.analyzerFindings.map((finding: DashboardState["analyzerFindings"][number]) => ({
+              id: finding.id,
+              title: finding.title,
+              message: finding.message,
+              type: finding.type,
+              severity: finding.severity,
+              createdAt: finding.createdAt.toISOString(),
+            }))}
+          />
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+
+        <div className="grid gap-6 lg:grid-cols-2">
+          <WorkoutLogPanel
+            workouts={state.workoutLogs.map((log: DashboardState["workoutLogs"][number]) => ({
+              id: log.id,
+              title: log.title,
+              scheduledDate: log.scheduledDate.toISOString(),
+              completed: log.completed,
+              notes: log.notes,
+            }))}
+          />
+          <CalendarPanel
+            items={state.calendarItems.map((item: DashboardState["calendarItems"][number]) => ({
+              id: item.id,
+              title: item.title,
+              dueDate: item.dueDate.toISOString(),
+              completed: item.completed,
+            }))}
+          />
         </div>
-      </main>
-    </div>
+      </section>
+    </main>
   );
 }
