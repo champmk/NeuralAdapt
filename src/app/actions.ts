@@ -34,7 +34,8 @@ export async function updateFeatureSelection(formData: FormData) {
     },
   });
 
-  revalidatePath("/");
+  revalidatePath("/dashboard");
+  revalidatePath("/start");
 }
 
 const workoutFormSchema = z.object({
@@ -91,7 +92,8 @@ export async function submitWorkoutGeneration(formData: FormData) {
         : undefined,
   });
 
-  revalidatePath("/");
+  revalidatePath("/dashboard");
+  revalidatePath("/start");
 }
 
 const journalSchema = z.object({
@@ -109,7 +111,8 @@ export async function createJournalEntry(formData: FormData) {
     },
   });
 
-  revalidatePath("/");
+  revalidatePath("/dashboard");
+  revalidatePath("/journal/new");
 }
 
 const workoutLogSchema = z.object({
@@ -136,7 +139,7 @@ export async function createWorkoutLog(formData: FormData) {
     },
   });
 
-  revalidatePath("/");
+  revalidatePath("/dashboard");
 }
 
 const toggleWorkoutSchema = z.object({
@@ -157,7 +160,7 @@ export async function toggleWorkoutCompletion(formData: FormData) {
     data: { completed: parsed.completed },
   });
 
-  revalidatePath("/");
+  revalidatePath("/dashboard");
 }
 
 const calendarSchema = z.object({
@@ -181,5 +184,26 @@ export async function createCalendarItem(formData: FormData) {
     },
   });
 
-  revalidatePath("/");
+  revalidatePath("/dashboard");
+}
+
+const toggleCalendarSchema = z.object({
+  itemId: z.string().min(1),
+  completed: z.string().transform((value) => value === "true"),
+});
+
+export async function toggleCalendarItemCompletion(formData: FormData) {
+  const parsed = toggleCalendarSchema.parse({
+    itemId: formData.get("itemId")?.toString(),
+    completed: formData.get("completed")?.toString(),
+  });
+
+  const user = await getDemoUser();
+
+  await prisma.calendarItem.updateMany({
+    where: { id: parsed.itemId, userId: user.id },
+    data: { completed: parsed.completed },
+  });
+
+  revalidatePath("/dashboard");
 }

@@ -37,7 +37,7 @@ export function WorkoutGeneratorForm({ visible }: WorkoutGeneratorFormProps) {
       <div className="flex flex-col gap-2">
         <h2 className="text-lg font-semibold">AI Workout Programmer Intake</h2>
         <p className="text-sm text-white/70">
-          OpenAI will craft a multi-day plan and export it as an Excel file for you. Keep inputs concise to control token usage.
+          OpenAI now crafts a periodized block you can review on the dashboard and export to Excel. Keep inputs concise to control token usage.
         </p>
       </div>
 

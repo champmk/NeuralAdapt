@@ -15,6 +15,7 @@ type SuccessWebSummaryProps = {
     programName: string;
     createdAt: string;
     artifactPath: string;
+    hasRenderablePlan: boolean;
   } | null;
 };
 
@@ -70,6 +71,14 @@ export function SuccessWebSummary({ selection, latestWorkout }: SuccessWebSummar
               >
                 Download Excel Export
               </a>
+              {latestWorkout.hasRenderablePlan ? (
+                <a
+                  href="#workout-plan"
+                  className="mt-2 inline-flex items-center gap-2 text-sm text-indigo-300 hover:text-indigo-200"
+                >
+                  View In Dashboard
+                </a>
+              ) : null}
             </div>
           ) : (
             <p className="mt-2 text-sm text-white/70">

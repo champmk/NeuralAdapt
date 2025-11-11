@@ -1,0 +1,152 @@
+.button {
+  position: relative;
+  display: inline-flex;
+  border-radius: 9999px;
+  padding: 1px;
+  overflow: hidden;
+  text-decoration: none;
+  background: rgba(38, 38, 38, 0.7);
+  backdrop-filter: blur(6px);
+}
+
+.button::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(circle at 30% 20%, rgba(122, 105, 249, 0.4), transparent 60%),
+    radial-gradient(circle at 70% 50%, rgba(242, 99, 120, 0.35), transparent 65%),
+    radial-gradient(circle at 40% 80%, rgba(245, 131, 63, 0.35), transparent 70%);
+  opacity: 0.7;
+  z-index: 0;
+  animation: glowTranslate 9s ease-in-out infinite alternate;
+}
+
+.button::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: rgba(9, 9, 18, 0.85);
+  z-index: 0;
+}
+
+.borderGlow {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+.borderGlow::before {
+  content: "";
+  position: absolute;
+  width: 3rem;
+  inset: 0;
+  margin: auto;
+  border-radius: 9999px;
+  background: linear-gradient(135deg, rgba(122, 105, 249, 0.9), rgba(242, 99, 120, 0.9), rgba(245, 131, 63, 0.9));
+  filter: blur(24px);
+  opacity: 0.6;
+  animation: glowScale 10s ease-in-out infinite alternate;
+}
+
+.content {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  border-radius: 9999px;
+  padding: 0.6rem 1.6rem 0.6rem 0.85rem;
+  background: rgba(15, 15, 25, 0.9);
+  color: #f8fafc;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-decoration: none;
+  transition: transform 0.35s ease;
+}
+
+.button:hover .content {
+  transform: translateY(-0.5px) scale(1.01);
+}
+
+.iconWrapper {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 2.6rem;
+  height: 2.6rem;
+  border-radius: 9999px;
+  background: radial-gradient(circle at 50% 50%, rgba(122, 105, 249, 0.75), rgba(13, 13, 22, 0.9));
+  transition: transform 0.5s ease;
+}
+
+.button:hover .iconWrapper {
+  transform: rotate(360deg) scale(1.05);
+}
+
+.iconGlow {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(135deg, rgba(59, 196, 242, 0.45), rgba(122, 105, 249, 0.55), rgba(242, 99, 120, 0.45), rgba(245, 131, 63, 0.45));
+  filter: blur(18px);
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.button:hover .iconGlow {
+  opacity: 0.35;
+}
+
+.iconWrapper svg {
+  width: 1.1rem;
+  height: 1.1rem;
+  animation: starRotate 14s cubic-bezier(0.68, -0.55, 0.27, 1.55) infinite alternate;
+}
+
+.label {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  background: linear-gradient(180deg, rgba(248, 250, 252, 0.95), rgba(248, 250, 252, 0.55));
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  letter-spacing: 0.18em;
+  transition: transform 0.35s ease;
+}
+
+.button:hover .label {
+  transform: scale(1.05);
+}
+
+@keyframes glowTranslate {
+  0% {
+    transform: translate3d(-10%, -15%, 0);
+  }
+  50% {
+    transform: translate3d(8%, 10%, 0);
+  }
+  100% {
+    transform: translate3d(-6%, 5%, 0);
+  }
+}
+
+@keyframes glowScale {
+  0% {
+    transform: translateX(-55%) scaleX(0.6);
+  }
+  100% {
+    transform: translateX(55%) scaleX(1);
+  }
+}
+
+@keyframes starRotate {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
